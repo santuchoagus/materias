@@ -1,0 +1,218 @@
+\usepackage{ifthen}
+\usepackage{subcaption}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{relsize}
+\usepackage{exscale}
+\usepackage[dvipsnames]{xcolor}
+% Indentacion para que vaya hacia adentro
+\newenvironment{IndentedBlock}
+{
+    \begin{list}{}{
+        \leftmargin=2em
+        \rightmargin=0em
+        \topsep=0pt
+        \partopsep=0pt
+        \parsep=3pt
+        \itemsep=0pt
+    }
+    \item\relax
+}
+{
+    \end{list}
+}
+%
+%
+
+% para los tres comandos de parametros
+% #1 es el nombre
+% #2 es el tipo
+\newcommand{\In}[2]{\textsf{in} #1 : #2}
+\newcommand{\Out}[2]{\textsf{out} #1 : #2}
+\newcommand{\Inout}[2]{\textsf{inout} #1 : #2}
+
+\newcommand{\requiere}[2][]{%
+    {\normalfont\bfseries\ttfamily requiere}%
+    \ifthenelse{\equal{#1}{}}{}{\ {\normalfont\ttfamily #1}}%
+    \ :\ %
+    \{\ensuremath{#2}\}\\ %
+}
+
+\newcommand{\asegura}[2][]{%
+    {\normalfont\bfseries\ttfamily asegura}%
+    \ifthenelse{\equal{#1}{}}{}{\ {\normalfont\ttfamily #1}}%
+    \ :\ %
+    \{\ensuremath{#2}\}\\ %
+}
+
+%
+%
+%
+%
+%
+% custom
+%
+%
+
+
+
+\newcommand{\predheader}[2]{%
+{\normalfont\bfseries\ttfamily\noindent pred}
+{\normalfont\ttfamily #1}%
+(#2)\ %
+}
+
+% #1 nombre del pred.
+% #2 parametros del pred
+\newenvironment{pred}[2]{
+\predheader{#1}{#2}%
+\{%
+\begin{IndentedBlock}
+}{
+\end{IndentedBlock}
+
+\}%
+}
+
+\newcommand{\auxheader}[3]{
+{\normalfont\bfseries\ttfamily aux}
+{\normalfont\ttfamily #1}%
+(#2) : {\normalfont\ttfamily #3}%
+}
+
+% #1 nombre del aux
+% #2 parametros del aux
+% #3 tipo del aux
+\newenvironment{aux}[3]{
+\auxheader{#1}{#2}{#3}\ = $\cdots$%
+\vspace{-1pt}
+\par
+\begin{IndentedBlock}
+}{
+\end{IndentedBlock}
+\vspace{0em}
+}
+
+\newcommand{\procheader}[3]{
+{\normalfont\bfseries\ttfamily proc}
+{\normalfont\ttfamily #1}%
+(#2)%
+\ifthenelse{\equal{#3}{}}{\ }{ : #3\ }%
+}
+
+% #1 nombre del proc.
+% #2 parametros
+% #3 tipo del resultado
+\newenvironment{proc}[3]{
+\procheader{#1}{#2}{#3}%
+\{%
+\begin{IndentedBlock}
+}{
+\end{IndentedBlock}
+\}%
+}
+
+\usepackage{ifthen}
+
+\newcommand{\tadheader}[2]{
+{\normalfont\bfseries\ttfamily\noindent TAD}%
+\ %
+{\normalfont\ttfamily #1}%
+\ifthenelse{\equal{#2}{}}{}{%
+{$\langle$#2$\rangle$}%
+}%
+}
+\newenvironment{tad}[2]{
+\tadheader{#1}{#2}
+    \{%
+    \begin{IndentedBlock}
+}{
+    \end{IndentedBlock}
+    \}%
+}
+
+% Tipos
+\newcommand{\tnat}{\ensuremath{\mathds{N}}}
+\newcommand{\tint}{\ensuremath{\mathds{Z}}}
+\newcommand{\treal}{\ensuremath{\mathds{R}}}
+\newcommand{\tbool}{\ensuremath{\mathsf{Bool}}}
+\newcommand{\tfloat}{\ensuremath{\mathsf{Float}}}
+\newcommand{\tchar}{\ensuremath{\mathsf{Char}}}
+\newcommand{\tstring}{\ensuremath{\mathsf{String}}}
+%tipo generico
+\newcommand{\tg}[1]{\ensuremath{\mathrm{#1}}}
+
+%Tipos complejos
+\newcommand{\ttuple}[1]{\ensuremath{\mathsf{Tuple}\langle#1\rangle}}
+\newcommand{\ttup}[1]{\ttuple{#1}}
+\newcommand{\tstruct}[1]{\ensuremath{\mathsf{Struct}\langle#1\rangle}}
+\newcommand{\tseq}[1]{\ensuremath{\mathsf{Seq}\langle#1\rangle}}
+\newcommand{\tconj}[1]{\ensuremath{\mathsf{Conj}\langle#1\rangle}}
+\newcommand{\tdict}[1]{\ensuremath{\mathsf{Dict}\langle#1\rangle}}
+
+% Comentarios para mas claridad
+\newcommand{\comment}[1]{%
+\textcolor{Periwinkle}{// #1}\\%
+}
+
+%suma y union
+%#1 limite inferior
+%#2 limite superior
+\newcommand{\bigsum}[2]{
+\ensuremath{\mathlarger{\mathlarger{\mathlarger{\sum}}}\limits_{#1}^{#2}}
+}
+
+%#1 limite inferior
+%#2 limite superior
+\newcommand{\bigunion}[2]{
+\ensuremath{\mathlarger{\mathlarger{\mathlarger{\bigcup}}}\limits_{#1}^{#2}}
+}
+
+% Parentesis
+% en caso de necesitar y hacerlo mas legible
+\newcommand{\bbpar}[1]{\biggl(#1\biggr)}
+\newcommand{\bpar}[1]{\Bigl(#1\Bigr)}
+
+
+% Logica
+\newcommand{\cand}{\land _L}
+\newcommand{\cor}{\lor _L}
+\newcommand{\impl}{\ensuremath{\longrightarrow}}
+\newcommand{\simpl}{\ensuremath{\rightarrow}} %mas chico
+\newcommand{\cimpl}{\ensuremath{\impl _L}}
+\newcommand{\csimpl}{\ensuremath{\simpl _L}} %mas chico
+\newcommand{\True}{\ensuremath{\mathrm{true}}}
+\newcommand{\False}{\ensuremath{\mathrm{false}}}
+\newcommand{\Iff}{\ensuremath{\longleftrightarrow}}
+\newcommand{\IfThenElseFi}[3]{\ensuremath{\mathsf{if}\ #1\ \mathsf{then}\ #2\ \mathsf{else}\ #3\ \mathsf{fi}}}
+
+
+\newcommand{\IfThenElse}[3]{%
+\mathrm{IfThenElse}(#1, #2, #3)%
+}
+
+\newcommand{\nsum}[1][1.4]{% only for \displaystyle
+    \mathop{%
+        \raisebox
+            {-#1\depthofsumsign\depthofsumsign}
+            {\scalebox
+                {#1}
+                {$\displaystyle\sum$}%
+            }
+    }
+}
+
+% Extras
+
+% alias de tipo
+% #1 es el nombre del alias
+% #2 es el tipo.
+\newcommand{\alias}[2]{\noindent #1 \textbf{ES}\ #2}
+
+% observadores
+% #1 nombre del tipo
+% #2 tipo
+\newcommand{\obs}[2]{\textbf{obs} \ensuremath{#1} : #2}
+% llamado a funcion
+% ej call{foo}{bar}
+\newcommand{\call}[2]{\mathrm{#1}(#2)}

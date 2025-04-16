@@ -1,0 +1,100 @@
+\documentclass{article}
+\input{macrosagus}
+\setlength{\parskip}{1em}
+
+
+\begin{document}
+
+\section{Macros TAD, proc, pred y aux}
+% Comentarios para escribir sobre tu spec.
+\comment{Macros para TAD y spec.}
+
+
+% aliasing de tipos
+\alias{Bloque}{\tstruct{id : \tint, lista : \tseq{\cdots}}}
+
+\par
+% Se abre y se cierra el TAD, se puede dejar vacio sus parametros.
+\begin{tad}{nombreTad}{}
+
+\end{tad}
+
+\par
+% El parametro son los genericos, es en modo texto.
+\begin{tad}{Diccio}{K, V}
+\obs{d}{\tdict{K, V}}
+
+% Definir procs
+\begin{proc}{definirYValidar}{\Inout{D}{Diccio}, \In{k}{K}, \In{v}{V}}{\tbool}
+% tambien sirve \requiere{}
+\requiere{D = D_0}
+% tambien sirve \asegura{}
+\asegura{D.d = \call{setKey}{D_0, k, v}}
+\asegura{res = \True \Iff k \in D.d}
+
+\end{proc}
+
+% Definir predicados.
+\begin{pred}{esLlave}{D : Diccio, k : K}
+% poner entrada entre $...$ para escribir en modo matematico en vez de modo texto.
+$res = \True \Iff k \in D.d$
+\end{pred}
+
+\begin{pred}{soloValoresRepetidos}{D : Diccio}
+% Si no le pongo $$ esta en modo texto
+Devuelve true si los valores son todos iguales...
+\end{pred}
+
+\begin{aux}{sumaElementosSiSonPrimos}{s : \tseq{\tint}}{\tint}
+% Al igual que pred hay que entrar a modo math con $$
+% Ojo, escribir IfThenElse con las mayusculas, el minusculas es de latex
+$\bigsum{i=0}{|s|-1} \IfThenElse{\call{esPrimo}{s[i]}}{s[i]}{0}$
+\end{aux}
+\end{tad}
+
+\pagebreak
+\section{Ejemplo de comandos}
+\alias{nombre}{definicion}\\%
+\obs{var}{Tipo}\\%
+\requiere{\cdots}%
+\asegura{\cdots}%
+\In{a}{TipoA} \\%
+\Out{b}{TipoB} \\%
+\Inout{c}{TipoC} \\%
+% Tipos
+\comment{Tipos}
+\tnat, \tint, \treal \\%
+\tbool, \tfloat, \tchar, \tstring \\%
+% Tipo generico, se usa para escribir en modo math y que salga derecha la letra y no curva.
+$\tg{T}$, $T$ \\%
+%
+% Tipos complejos, son los que tienen parametros
+\ttuple{\tint, \tg{T}} \\ % Tambien podes usar \ttup{}
+\tstruct{id : \tint, sueldo : \treal} \\%
+\tseq{\tchar} \\%
+\tconj{\cdots} \\%
+\tdict{\tg{K, V}} \\[2em]
+\comment{Parentesis grandes (para sumas y uniones sirve)}
+$\bbpar{\bpar{\cdots}}$\\
+% Suma y union, y otros
+\comment{Suma, union y otros}
+% las cosas matematica van en modo math osea $$
+$\bigsum{i=0}{\infty} \cdots$\\
+$\bigsum{i=0}{|A|-1}\bbpar{\bigsum{j=0}{|A[i]|-1} A[i][j]}$\\
+$\bigsum{a \in A}{} \call{func}{a}$\\
+% Uniones
+$\bigunion{subindice}{superindice} aplicacion$\\[2em]
+\comment{Llamado a funciones, sirve para el modo math}
+% Estos llamados a funciones conservan la tipografia del modo texto pero en modo matematico
+$\call{funcion}{a, b}$\\
+versus:\\
+$funcion(a, b)$\\[2em]
+\comment{Logica}
+$\True, \False, \land, \lor, \impl, \Iff$\\
+$\cand, \cor, \cimpl$\\
+\comment{Version corta de logica (por si esta muy grande)}\\
+$\simpl y \csimpl$\\
+\comment{Dos versiones de IfThenElse}\\
+$\IfThenElse{B}{S_1}{S_2}$\\
+$\IfThenElseFi{B}{S_1}{S_2}$\\
+\end{document}

@@ -1,0 +1,41 @@
+\documentclass{article}
+
+\usepackage{graphicx} % Required for inserting images
+\usepackage[margin=1in]{geometry}
+\usepackage{multicol}
+%\setlength{\columnseprule}{1pt}
+\input{codemacros}
+
+\begin{document}
+\section{PLP}
+
+
+\begin{multicols}{2}
+\begin{haskcode}
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f z [] = z
+foldr f z (x:xs) = f x (foldr f z xs)
+\end{haskcode}
+
+\begin{haskcode}
+recr :: (a -> [a] -> b -> b) -> b -> [a] -> b
+recr f z [] = z
+recr f z (x:xs) = f x xs (recr f z xs)
+\end{haskcode}
+
+\begin{haskcode}
+reverse :: [a] -> [a] -> [a]
+reverse [] = []
+reverse (x:xs) = reverse xs ++ [xs]
+-- Def. alternativa reverse
+reverse xs = foldr (\\x rec -> rec ++ (x:[])) [] 
+\end{haskcode}
+
+%\columnbreak
+
+\end{multicols}
+
+
+
+\end{document}
+

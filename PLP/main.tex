@@ -3,11 +3,19 @@
 \usepackage{graphicx} % Required for inserting images
 \usepackage[margin=1in]{geometry}
 \usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{mathrsfs}
+
 %\setlength{\columnseprule}{1pt}
 \input{codemacros}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{10pt}
 
 \begin{document}
-\section{PLP}
+\section{Funciones conocidas}
 
 
 \begin{multicols}{2}
@@ -15,6 +23,10 @@
 foldr :: (a -> b -> b) -> b -> [a] -> b
 foldr f z [] = z
 foldr f z (x:xs) = f x (foldr f z xs)
+\end{haskcode}
+
+\begin{haskcode}
+foldl ... (tambien version con foldr)
 \end{haskcode}
 
 \begin{haskcode}
@@ -28,14 +40,160 @@ reverse :: [a] -> [a] -> [a]
 reverse [] = []
 reverse (x:xs) = reverse xs ++ [xs]
 -- Def. alternativa reverse
-reverse xs = foldr (\\x rec -> rec ++ (x:[])) [] 
+reverse = foldr (\\x rec -> rec ++ (x:[])) [] 
 \end{haskcode}
+
+\begin{haskcode}
+map :: (a -> b) -> [a] -> [b]
+map f [] = []
+map f (x:xs) = f x : (map f xs)
+\end{haskcode}
+
+\begin{haskcode}
+... version de map con foldr
+\end{haskcode}
+
 
 %\columnbreak
 
 \end{multicols}
 
+\section{Esquemas de recursión}
+\subsection{Recursión estructural}
+Sea $g :: [a] \to b$
+\begin{align}
+g \emptyList &= \langle CB\rangle(z) \\
+g\ (x:xs) &= \langle CR\rangle(... x\ ...\ (g\ xs) ...)
+\end{align}
 
+Los casos base $CB_i$ devuelven $z_i$ que no dependen de $g$, mientras que los casos recursivos no tienen las variables $g$ ni $xs$ por separado, excepto en la expresión $(g\ xs)$.
+Podría aparecer de la forma $g\ ...\ xs\ ...$ en caso que g tomara parámetros en cierto orden, pero nunca de la forma $g\ (f \ xs)$ (es decir, operar sobre el contenido de xs antes de llamar a la recursión) ya que esto no garantiza que la lista es cada vez mas pequeña.
+\par\noindent
+Foldr abstrae el esquema de recursión estructural, y decimos que toda recursión estructural es una instancia de foldr.
+
+\subsection{Recursión primitiva}
+Sea $g :: [a] \to b$
+\begin{align}
+g \emptyList &= \langle CB\rangle(z) \\
+g\ (x:xs) &= \langle CR\rangle(... x\ ...\ \bm{xs}\ ...\ (g\ xs) ...)
+\end{align}
+
+\par\noindent
+Análogo al esquema de recursión estructural, pero permite referirse a $xs$ fuera del término $(g\ xs)$.
+
+\par\noindent
+Toda recursión primitiva es una instancia de \textbf{recr}.
+
+\subsection{Recursión iterativa}
+Sea $g :: b \to [a] \to b$
+\begin{align}
+g\ ac \emptyList &= \langle CB\rangle(z) \\
+g\ ac\ (x:xs) &= \langle CR\rangle(... x\ ...\ xs\ ...\ \bm{(g\ ac'\ xs)} ...)
+\end{align}
+\par\noindent
+Invoca a $(g\ ac'\ xs)$ donde $ac' = f\  (...ac\ ...x)$ es el nuevo acumulador actualizado en función de su valor anterior y la variable $x$.
+\par\noindent
+Toda recursión iterativa es una instancia de \textbf{foldl}.
+
+\begin{align*}
+foldr\ (\boxplus)\ z\ [a,b,c] &= a\ \boxplus\ (b \boxplus\ (c \boxplus\ z)) \\
+foldl\ (\boxplus)\ z\ [a,b,c] &= ((z  \boxplus\ a)  \boxplus\ b) \boxplus\ c
+\end{align*}
+
+
+\section{Tipos de datos algebráicos}
+\subsection{Tipos enumerados}
+Constructores de tipo no extensibles, y declara que son los únicos constructores de ese tipo.
+
+\begin{centeredhaskcode}
+data Tipo = Const1 | Const2 | Const3 | ...
+\end{centeredhaskcode}
+
+\subsection{Tipos producto}
+\begin{centeredhaskcode}
+data Tipo = Constuctor T1 T2 T3
+\end{centeredhaskcode}
+Donde T1 T2 y T3 son tipos, es decir un constructor con muchos parametros.
+
+\subsection{Tipos recursivos}
+Son tipos de datos inductivos, tiene un constructor base "CBase" y un constructor que toma al menos un parametro del tipo que lo está definiendo.
+\begin{centeredhaskcode}
+data Tipo = CBase | Constructor Tipo
+\end{centeredhaskcode}
+
+\subsection{Caso general}
+Los tipos algebráicos tienen la forma
+\begin{align*}
+\mathrm{data\ }T & = CB_1 \langle cb\_params_1\ \text{sin el tipo } T \rangle\\  
+&| \quad\quad \vdots \\
+&|\quad  CB_1 \langle cb\_params_n\ \text{sin el tipo } T\ \rangle\\
+&|\quad  CR_1 \langle cr\_params_1 \dots\ T \rangle\\
+&| \quad\quad \vdots \\
+&|\quad  CR_1 \langle cr\_params_m \dots\ T \rangle\\
+\end{align*}
+
+\subsection{Recursion estructural en general}
+Sea $g :: T \to \mathbb{Y}$
+\begin{align*}
+g\ (CB_1\ \langle cb_\_params_1\rangle)\ \dots&= \langle CB_1\rangle(z_1) \\
+& \hspace{5pt}\vdots\\
+g\ (CB_n\ \langle cb_\_params_n\rangle)\ \dots&= \langle CB_n\rangle(z_n) \\
+g\ (CR_2\ \langle cr_\_params_1\rangle)\ \dots&= \langle CR_1\rangle(z_1) \\
+& \hspace{5pt}\vdots\\
+g\ (CR_m\ \langle cr_\_params_m\rangle)\ \dots&= \langle CR_m\rangle(z_m    ) \\
+\end{align*}
+Donde $CB_k$, $CR_k$ es el $k$-iésimo caso base/recursivo, y $cb\_params_k$, $cr\_params_k$ los parametros para ese constructor respectivamente.
+
+Así como definiamos el fold en listas de tal forma que el tipo es
+\begin{haskcode}
+foldr :: (a -> b -> b) -> b -> [a] -> b
+\end{haskcode}
+Esto significa que \verb|(a -> b -> b)| es la función que va a manejar el constructor cons de listas \verb+Cons List a+, y el \verb|b| que aparece solo le corresponde al caso base de la lista vacía$\emptyList$.
+
+De esta podemos definir la función fold para cualquier tipo recursivo armando una función por cada uno de sus constructores.
+
+[TODO: falta poner mas info acá o un ejemplo]
+
+\section{Inducción estructural}
+\subsection{Principio de inducción estructural}
+\begin{samepage}
+Sea $\mathcal{P}(y)$ un predicado sobre un $ y:: \mathcal{T}$\\
+\begin{flalign*}
+& \forall cb\_params_1\ . \mathcal{P}(CB_1)\  \land \cdots \land\ \forall cb\_params_n\ . \ \mathcal{P}(CB_n)\\
+& \forall cr\_params_1\ . \forall x ::\mathcal{T}\ . (\mathcal{P}(x) \implies \mathcal{P}(CR_1 ... x ....))\\
+& \hspace{40pt}\vdots\hspace{95pt}\vdots \\
+& \forall cr\_params_m\ . \forall x ::\mathcal{T}\ . (\mathcal{P}(x) \implies \mathcal{P}(CR_m ... x ....))
+\end{flalign*}
+\centering\rule{250pt}{0.4pt}
+$$\vdash \forall x::\mathcal{T}\ .\ \mathcal{P}(x)$$
+\end{samepage}
+
+\section{Lemas de generación}
+Todos los tipos inductivos tienen un lema de generación, viene de la noción de como se construyen los tipos, si tenemos alguna expresión
+$$...E ...= ...$$
+y sabemos que $E :: \mathcal{T}$ donde $\text{data }\mathcal{T}= A\ |\ B$ entonces sabemos que $E$ solo puede haber sido construído como $A$ o $B$.
+
+En general tenemos que para algún tipo inductivo cualquiera
+\begin{haskcode}
+data Ttype a b = Nil | Const1 a | Const2 b | Const3 a b
+\end{haskcode}
+Tenemos que algúna expresión $E :: \text{Ttype}$, $E$ solo puede haber sido construido con uno de esos constructores, formalmente
+
+si $e :: \text{Ttype}$ entonces
+
+$\exists x :: a\ .\exists y :: b\ . (E = \text{Nil})\ \lor\ (E = \text{Const1 x}) \lor\ (E = \text{Const2 y}) \lor\ (E = \text{Const3 x y})$
+
+\section{Principio de extensionalidad funcional}
+Desde un punto de vista \textbf{intensional} dos valores son iguales si están construidos de la misma manera. Desde el punto de vista \textbf{extensional} dos valores son iguales so son indistinguibles al observador.
+
+Normalmente pensamos que si $f = g$ entonces $\forall x :: a\ .f\ x = g\ x$ pensandolo de forma inversa hariamos el principio de extensionalidad funcional que es la siguiente implicación:
+
+si $\forall x :: a\ .f\ x = g\ x$ entonces $f = g$
+
+[TODO: falta isomorfismo de tipos]
+[TODO: falta ejemplos de generalizacion de predicados de inductivos]
+[TODO: Lemas auxiliares]
+
+\section{Sistemas deductivos}
 
 \end{document}
-
